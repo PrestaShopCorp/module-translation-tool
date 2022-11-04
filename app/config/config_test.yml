@@ -1,0 +1,26 @@
+imports:
+    - { resource: config_dev.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        collect: false
+
+web_profiler:
+    toolbar: false
+    intercept_redirects: false
+
+
+# mocks
+services:
+    _defaults:
+        public: true
+
+    AppBundle\:
+        resource: '../../src/{Command}'
+        tags: ['console.command']
+
+    prestashop.translation.chainextractor:
+        class: Tests\AppBundle\Mock\ChainExtractorMock

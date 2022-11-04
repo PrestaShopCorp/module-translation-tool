@@ -1,0 +1,8 @@
+parameters:
+    default_language: 'en-US'
+
+services:
+    app.github.api:
+        class: AppBundle\Github\Api
+        arguments:
+            - '%github_token%'

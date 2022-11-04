@@ -1,0 +1,27 @@
+parameters:
+    default_language: 'en-US'
+
+services:
+    AppBundle\Command\BaseCommand:
+        abstract:  true
+        arguments:
+            - '%translation.dir_dump%'
+
+    AppBundle\Command\ExportDefaultCatalogCommand:
+        parent: AppBundle\Command\BaseCommand
+        arguments:
+            - '%default_language%'
+        tags: [{ name: 'console.command'}]
+
+    AppBundle\Command\ExtractCommand:
+        parent: AppBundle\Command\BaseCommand
+        arguments:
+            - '%default_language%'
+            - '@app.dumper.xliff'
+            - '@prestashop.translation.chainextractor'
+        tags: [{ name: 'console.command'}]
+
+    AppBundle\Command\PushCommand:
+        arguments:
+            - '@app.github.api'
+        tags: [{ name: 'console.command'}]
