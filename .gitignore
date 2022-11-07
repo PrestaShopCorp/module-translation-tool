@@ -1,5 +1,6 @@
 .env*
 !.env.dist
+module.cfg
 composer.phar
 /app/config/parameters.yml
 /app/dumps/*
