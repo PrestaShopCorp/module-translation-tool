@@ -6,7 +6,7 @@
   "require": {
     "php": ">=7.2.5",
     "ext-zip": "*",
-    "czproject/git-php": "^3.8",
+    "czproject/git-php": "^4.0",
     "doctrine/annotations": "^1.13",
     "doctrine/doctrine-cache-bundle": "^1.2",
     "google/cloud-storage": "^1.28",
