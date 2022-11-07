@@ -28,8 +28,8 @@ declare(strict_types=1);
 
 namespace AppBundle\Services;
 
-use Cz\Git\GitException;
-use Cz\Git\GitRepository as BaseRepository;
+use CzProject\GitPhp\GitException;
+use CzProject\GitPhp\GitRepository as BaseRepository;
 
 /**
  * This class was introduced as an overlay of the initial GitRepository class because it lacked
@@ -38,21 +38,6 @@ use Cz\Git\GitRepository as BaseRepository;
  */
 class GitRepository extends BaseRepository
 {
-    protected function run($cmd/*, $options = NULL*/)
-    {
-        $args = func_get_args();
-        $cmd = self::processCommand($args);
-        exec($cmd . ' 2>&1', $output, $ret);
-        $outputString = var_export($output, true);
-
-        if ($ret !== 0) {
-            throw new GitException("Command '$cmd' failed (exit-code $ret) output: $outputString.", $ret);
-        }
-
-        return $this;
-    }
-
-
     /**
      * @param  string  host:PrestaShopCorp/repo.git | host:xz/foo.git | ...
      * @return string  PrestaShopCorp | xz | ...
@@ -64,5 +49,29 @@ class GitRepository extends BaseRepository
         }
 
         return null;
+    }
+
+    /**
+     * @param  string  /path/to/repo.git | host.xz:foo/.git | ...
+     * @return string  repo | foo | ...
+     */
+    public static function extractRepositoryNameFromUrl($url)
+    {
+        // /path/to/repo.git => repo
+        // host.xz:foo/.git => foo
+        $directory = rtrim($url, '/');
+        if(substr($directory, -5) === '/.git')
+        {
+            $directory = substr($directory, 0, -5);
+        }
+
+        $directory = basename($directory, '.git');
+
+        if(($pos = strrpos($directory, ':')) !== FALSE)
+        {
+            $directory = substr($directory, $pos + 1);
+        }
+
+        return $directory;
     }
 }

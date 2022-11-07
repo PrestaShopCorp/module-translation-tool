@@ -4,7 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Github\Api;
 use AppBundle\Services\GitRepository;
-use Cz\Git\GitException;
+use CzProject\GitPhp\GitException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -118,7 +118,7 @@ class PushCommand extends Command
                 // Commit changes
                 $repository->addAllChanges();
                 $repository->commit(sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime));
-                $repository->push($repositoryUrl, [$branchName]);
+                $repository->push(null, [$repositoryUrl, $branchName]);
                 $output->writeln('<info>Translations pushed</info>');
 
                 // Create the pull request
@@ -139,6 +139,7 @@ class PushCommand extends Command
                 }
             } catch (GitException $e) {
                 $output->writeln(sprintf('GitException occurred: %s-%s', $e->getCode(), $e->getMessage()));
+                var_dump($e->getRunnerResult()->toText());
 
                 return 1;
             }
