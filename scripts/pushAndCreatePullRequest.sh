@@ -47,7 +47,7 @@ function readVariables {
 
 function pushTranslationToGit {
 	cd "$TOOL_DIR"
-	php bin/console prestashop:translation:push-on-git "$MODULE_NAME" "$WORKDIR" $BRANCH -v
+	php bin/console prestashop:translation:push-on-git "$GIT_REPO" "$MODULE_NAME" "$WORKDIR" $BRANCH -v
 }
 
 echo "You're about to push the catalog to Git."

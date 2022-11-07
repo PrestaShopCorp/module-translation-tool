@@ -49,6 +49,7 @@ class PushCommand extends Command
         $this
             ->setName('prestashop:translation:push-on-git')
             ->setDescription('Push updates on repository on GitHub and creates a Pull Request')
+            ->addArgument('repository-url', InputArgument::REQUIRED, 'The repository URL with authentication params')
             ->addArgument('module', InputArgument::REQUIRED, 'Name of the module')
             ->addArgument('workdir', InputArgument::REQUIRED, 'The directory where the sources are')
             ->addArgument('source-branch', InputArgument::REQUIRED, 'The branch which translations are extracted')
@@ -73,6 +74,7 @@ class PushCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $repositoryUrl = $input->getArgument('repository-url');
         $moduleName = $input->getArgument('module');
         $workDir = $input->getArgument('workdir');
         $sourceBranch = $input->getArgument('source-branch');
@@ -90,6 +92,7 @@ class PushCommand extends Command
 
         $output->writeln(sprintf('Getting existing repository at %s', $gitDirectoryPath));
         $repository = new GitRepository($gitDirectoryPath);
+        $repository->setRemoteUrl('origin', $repositoryUrl);
 
         $dateTime = date('Y-m-d-H_i_s');
 
@@ -119,25 +122,20 @@ class PushCommand extends Command
                 $output->writeln('<info>Translations pushed</info>');
 
                 // Create the pull request
-                $repositoryRemotes = $repository->execute(['config', '--get', 'remote.origin.url']);
-                if (!empty($repositoryRemotes)) {
-                    $repositoryRemoteUrl = $repositoryRemotes[0];
+                $repositoryName = GitRepository::extractRepositoryNameFromUrl($repositoryUrl);
+                $repositoryUsername = GitRepository::extractUsernameFromUrl($repositoryUrl);
 
-                    $repositoryName = GitRepository::extractRepositoryNameFromUrl($repositoryRemoteUrl);
-                    $repositoryUsername = GitRepository::extractUsernameFromUrl($repositoryRemoteUrl);
+                if (!empty($repositoryUsername)) {
+                    $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
+                        'base'  => $sourceBranch,
+                        'head'  => $branchName,
+                        'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
+                        'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
+                    ]);
 
-                    if (!empty($repositoryUsername)) {
-                        $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
-                            'base'  => $sourceBranch,
-                            'head'  => $branchName,
-                            'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
-                            'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
-                        ]);
-
-                        $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
-                    } else {
-                        $output->writeln('<error>Error getting the repository username</error>');
-                    }
+                    $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
+                } else {
+                    $output->writeln('<error>Error getting the repository username</error>');
                 }
             } catch (GitException $e) {
                 $output->writeln(sprintf('GitException occurred: %s-%s', $e->getCode(), $e->getMessage()));

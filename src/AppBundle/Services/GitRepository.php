@@ -59,7 +59,7 @@ class GitRepository extends BaseRepository
      */
     public static function extractUsernameFromUrl($url): ?string
     {
-        if (preg_match('#(.*):(.*)\/(.*).git#', $url, $matches)) {
+        if (preg_match('#https:\/\/(.*)@github.com\/(.*)\/(.*).git#', $url, $matches)) {
             return $matches[2];
         }
 
