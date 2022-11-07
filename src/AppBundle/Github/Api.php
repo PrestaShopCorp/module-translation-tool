@@ -16,6 +16,11 @@ class Api extends AbstractApi
      */
     private $client;
 
+    /**
+     * @var string
+     */
+    private $githubToken;
+
     public function __construct(string $ghToken)
     {
         $filesystemAdapter = new Local(__DIR__ . '/../../../var/');
@@ -25,7 +30,8 @@ class Api extends AbstractApi
         $this->client = new Client();
         $this->client->addCache($pool);
 
-        $this->client->authenticate($ghToken, 'anything', AuthMethod::ACCESS_TOKEN);
+        $this->githubToken = $ghToken;
+        $this->client->authenticate($this->githubToken, 'anything', AuthMethod::ACCESS_TOKEN);
 
         parent::__construct($this->client);
     }
@@ -45,7 +51,12 @@ class Api extends AbstractApi
      */
     public function createPullRequest(string $username, string $repository, array $params)
     {
-        return $this->client->api('pull_request')->create($username, $repository, $params);
+        return $this->post(
+            '/repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/pulls',
+            $params,
+            [
+                'Authorization' => sprintf('token %s', $this->githubToken),
+            ]
+        );
     }
-
 }
