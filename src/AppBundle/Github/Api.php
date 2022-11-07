@@ -25,7 +25,7 @@ class Api extends AbstractApi
         $this->client = new Client();
         $this->client->addCache($pool);
 
-        $this->client->authenticate($ghToken, null, AuthMethod::ACCESS_TOKEN);
+        $this->client->authenticate($ghToken, 'anything', AuthMethod::ACCESS_TOKEN);
 
         parent::__construct($this->client);
     }
