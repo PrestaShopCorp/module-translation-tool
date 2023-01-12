@@ -7,9 +7,9 @@ SCRIPT_DIR="$(cd "$(dirname $0)" && pwd)"
 # TranslationTool directory
 TOOL_DIR="$(cd $SCRIPT_DIR/.. && pwd)"
 
-set -o allexport
-source "$TOOL_DIR/.env"
-set +o allexport
+#set -o allexport
+#source "$TOOL_DIR/.env"
+#set +o allexport
 
 source "$TOOL_DIR/module.cfg"
 
