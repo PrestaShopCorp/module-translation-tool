@@ -21,7 +21,7 @@ function readVariables {
       exit 1
     fi
 
-    if [ "$GITHUB_TOKEN" = "" ]; then
+    if [ "$APP_GITHUB_TOKEN" = "" ]; then
       echo "GIT token is required in env variables"
       exit 2
     fi
@@ -40,7 +40,7 @@ function readVariables {
       BRANCH="master"
     fi
 
-    GIT_REPO="https://oauth2:$GITHUB_TOKEN@github.com/$GIT_REPO_USERNAME/$GIT_REPO_NAME.git"
+    GIT_REPO="https://oauth2:$APP_GITHUB_TOKEN@github.com/$GIT_REPO_USERNAME/$GIT_REPO_NAME.git"
 
     echo "Using module $MODULE_NAME, repository $GIT_REPO with branch $BRANCH:"
 }
