@@ -40,7 +40,7 @@ function readVariables {
       BRANCH="master"
     fi
 
-    GIT_REPO="https://$GITHUB_TOKEN@github.com/$GIT_REPO_USERNAME/$GIT_REPO_NAME.git"
+    GIT_REPO="https://oauth2:$GITHUB_TOKEN@github.com/$GIT_REPO_USERNAME/$GIT_REPO_NAME.git"
 
     echo "Using module $MODULE_NAME, repository $GIT_REPO with branch $BRANCH:"
 }
