@@ -126,7 +126,7 @@ class PushCommand extends Command
                 $repositoryUsername = GitRepository::extractUsernameFromUrl($repositoryUrl);
 
                 if (!empty($repositoryUsername)) {
-                    $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryUrl, [
+                    $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
                         'base'  => $sourceBranch,
                         'head'  => $branchName,
                         'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),

@@ -6,5 +6,5 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     translation.dir_dump: "%kernel.root_dir%/dumps"
-    github_token: '%env(GITHUB_TOKEN)%'
-    env(GITHUB_TOKEN): putRealTokenHere
+    github_token: '%env(APP_GITHUB_TOKEN)%'
+    env(APP_GITHUB_TOKEN): putRealTokenHere
