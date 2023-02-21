@@ -40,6 +40,10 @@ function readVariables {
       BRANCH="master"
     fi
 
+    if [ "$DEFAULT_LOCALE" = "" ]; then
+      DEFAULT_LOCALE="en-US"
+    fi
+
     GIT_REPO="https://oauth2:$APP_GITHUB_TOKEN@github.com/$GIT_REPO_USERNAME/$GIT_REPO_NAME.git"
 
     echo "Using module $MODULE_NAME, repository $GIT_REPO with branch $BRANCH:"
@@ -90,12 +94,13 @@ function extractTranslations {
 
     #always do it from scratch
     fromScratchParam="--from-scratch=true"
+    defaultLocale="--default_locale=$DEFAULT_LOCALE"
 
     if [ ! -f "$configFile" ]; then
       cp "$TOOL_DIR/.t9n.yml" "$configFile"
     fi
 
-    php bin/console prestashop:translation:extract "$MODULE_NAME" "$configFile" $fromScratchParam -vvv
+    php bin/console prestashop:translation:extract "$MODULE_NAME" "$configFile" $fromScratchParam $defaultLocale -vvv
     php bin/console prestashop:translation:export "$MODULE_NAME" "$WORKDIR/$MODULE_NAME"
 }
 
