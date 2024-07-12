@@ -107,8 +107,7 @@ class PushCommand extends Command
 
             $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
             if (!empty($conflicts)) {
-                $output->writeln('<info>Conflicts detected. Resolving conflicts by keeping local changes.</info>');
-                // Utiliser les modifications locales pour résoudre les conflits
+                $output->writeln(sprintf('Conflicts detected. Resolving conflicts by keeping local changes.'));
                 $repository->execute(['checkout', '--ours', '.']);
                 $repository->execute(['add', '.']);
             }
