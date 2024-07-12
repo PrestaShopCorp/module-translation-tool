@@ -125,7 +125,7 @@ class PushCommand extends Command
                 // Commit changes
                 $repository->addAllChanges();
                 $repository->commit(sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime));
-                $repository->push(null, [$repositoryUrl, $branchName]);
+                $repository->push(null, [$repositoryUrl, $branchName, (!empty($conflicts)) ? '--force' : '']);
                 $output->writeln('<info>Translations pushed</info>');
 
                 // Create the pull request
