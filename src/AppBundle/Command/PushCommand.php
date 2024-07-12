@@ -102,14 +102,12 @@ class PushCommand extends Command
         if (in_array('origin/' . $branchName, $remoteBranches)) {
             $output->writeln(sprintf('Checking out to existing branch %s', $branchName));
             $repository->execute('stash');
-            $repository->checkout($branchName);
+            $repository->checkout('origin/' . $branchName);
             @$repository->execute(['stash', 'pop']);
             $repository->execute(['checkout', '--theirs', '.']);
         } else {
             $output->writeln(sprintf('Creating new branch %s', $branchName));
-//            $repository->execute('stash');
             $repository->checkout($sourceBranch);
-//            @$repository->execute(['stash', 'pop']);
             $repository->createBranch($branchName, true);
         }
 
