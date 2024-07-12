@@ -104,7 +104,14 @@ class PushCommand extends Command
             $repository->execute('stash');
             $repository->checkout('origin/' . $branchName);
             @$repository->execute(['stash', 'pop']);
-            $repository->execute(['checkout', '--theirs', '.']);
+
+            $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
+            if (!empty($conflicts)) {
+                $output->writeln('<info>Conflicts detected. Resolving conflicts by keeping local changes.</info>');
+                // Utiliser les modifications locales pour résoudre les conflits
+                $repository->execute(['checkout', '--ours', '.']);
+                $repository->execute(['add', '.']);
+            }
         } else {
             $output->writeln(sprintf('Creating new branch %s', $branchName));
             $repository->checkout($sourceBranch);
