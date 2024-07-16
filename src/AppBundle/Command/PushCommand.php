@@ -104,7 +104,7 @@ class PushCommand extends Command
             $repository->execute('stash');
             $repository->checkout($branchName);
             $repository->execute('pull');
-            $repository->execute(['stash', 'apply', '-q']);
+            @$repository->execute(['stash', 'apply', '-q']);
 
             $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
             if (!empty($conflicts)) {
