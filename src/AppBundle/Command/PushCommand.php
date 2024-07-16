@@ -102,7 +102,7 @@ class PushCommand extends Command
         if (in_array('origin/' . $branchName, $remoteBranches)) {
             $output->writeln(sprintf('Checking out to existing branch %s', $branchName));
             $repository->execute('stash');
-            $repository->checkout('origin/' . $branchName);
+            $repository->checkout($branchName);
             @$repository->execute(['stash', 'pop']);
 
             $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
