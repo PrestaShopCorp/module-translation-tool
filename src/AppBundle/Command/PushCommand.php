@@ -106,7 +106,7 @@ class PushCommand extends Command
             $repository->execute('pull');
 
             try {
-                @$repository->execute(['stash', 'apply', '-q']);
+                $repository->execute(['stash', 'apply', '-q']);
             } catch(GitException $e) {}
 
             $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
@@ -134,7 +134,7 @@ class PushCommand extends Command
             try {
                 // Commit changes
                 $repository->addAllChanges();
-                $repository->commit(sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime));
+                $repository->commit(sprintf('Translation catalog update for version %s %s', $sourceBranch, $dateTime));
                 $repository->push(null, [$repositoryUrl, $branchName, (!empty($conflicts)) ? '--force' : null]);
                 $output->writeln('<info>Translations pushed</info>');
 
@@ -153,7 +153,7 @@ class PushCommand extends Command
                         $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
                             'base'  => $sourceBranch,
                             'head'  => $branchName,
-                            'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
+                            'title' => 'Translation catalog update',
                             'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
                         ]);
 
