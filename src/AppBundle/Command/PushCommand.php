@@ -107,9 +107,7 @@ class PushCommand extends Command
 
             try {
                 @$repository->execute(['stash', 'apply', '-q']);
-            } catch(GitException $e) {
-
-            }
+            } catch(GitException $e) {}
 
             $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
             if (!empty($conflicts)) {
