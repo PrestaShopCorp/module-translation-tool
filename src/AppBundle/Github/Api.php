@@ -59,4 +59,18 @@ class Api extends AbstractApi
             ]
         );
     }
+
+    /**
+     * Get a list of pull requests for a repository
+     *
+     * @param string $username
+     * @param string $repository
+     * @param array $params
+     *
+     * @return array
+     */
+    public function getPullRequests(string $username, string $repository, array $params = [])
+    {
+        return $this->client->api('pull_request')->all($username, $repository, $params);
+    }
 }

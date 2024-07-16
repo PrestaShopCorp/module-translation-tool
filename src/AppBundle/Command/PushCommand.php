@@ -134,14 +134,24 @@ class PushCommand extends Command
                 $repositoryUsername = GitRepository::extractUsernameFromUrl($repositoryUrl);
 
                 if (!empty($repositoryUsername)) {
-                    $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
-                        'base'  => $sourceBranch,
-                        'head'  => $branchName,
-                        'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
-                        'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
+                    $existingPRs = $this->githubApi->getPullRequests($repositoryUsername, $repositoryName, [
+                        'base' => $sourceBranch,
+                        'head' => $branchName,
+                        'state' => 'open'
                     ]);
 
-                    $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
+                    if (empty($existingPRs)) {
+                        $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
+                            'base'  => $sourceBranch,
+                            'head'  => $branchName,
+                            'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
+                            'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
+                        ]);
+
+                        $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
+                    } else {
+                        $output->writeln('<info>Pull request already exists, skipping creation</info>');
+                    }
                 } else {
                     $output->writeln('<error>Error getting the repository username</error>');
                 }
