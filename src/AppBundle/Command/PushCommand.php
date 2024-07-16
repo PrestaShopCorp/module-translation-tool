@@ -107,7 +107,7 @@ class PushCommand extends Command
 
             try {
                 @$repository->execute(['stash', 'apply', '-q']);
-            } catch(Exception $e) {
+            } catch(GitException $e) {
 
             }
 
