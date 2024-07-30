@@ -15,7 +15,7 @@ class PushCommandTest extends TestCase
         $this->assertEquals('owner_name', $pushCommand->extractOwnerName($repositoryUrl));
     }
 
-    public function testExtractOwnerNameWithNotUrl()
+    public function testExtractOwnerNameWithBadUrlValue()
     {
         $repositoryUrl = '000000';
         $api = new Api('secret_github_token');
