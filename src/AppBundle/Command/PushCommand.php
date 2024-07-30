@@ -75,6 +75,7 @@ class PushCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $repositoryUrl = $input->getArgument('repository-url');
+        $ownerName = $this->extractOwnerName($repositoryUrl);
         $moduleName = $input->getArgument('module');
         $workDir = $input->getArgument('workdir');
         $sourceBranch = $input->getArgument('source-branch');
@@ -145,7 +146,7 @@ class PushCommand extends Command
                 if (!empty($repositoryUsername)) {
                     $existingPRs = $this->githubApi->getPullRequests($repositoryUsername, $repositoryName, [
                         'base' => $sourceBranch,
-                        'head' => $branchName,
+                        'head' => $ownerName . ':' . $branchName,
                         'state' => 'open'
                     ]);
 
@@ -178,5 +179,20 @@ class PushCommand extends Command
         }
 
         return 0;
+    }
+
+    /**
+     * @param $repositoryUrl
+     * @return string
+     */
+    public function extractOwnerName(string $repositoryUrl): string
+    {
+        $parsedUrl = parse_url($repositoryUrl);
+
+        if (preg_match('#/([^/]+)/([^/]+)\.git$#', $parsedUrl['path'], $matches)) {
+            return $matches[1];
+        }
+
+        throw new \InvalidArgumentException('Cannot extract owner name from repository URL.');
     }
 }

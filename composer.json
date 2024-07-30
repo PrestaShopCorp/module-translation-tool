@@ -23,7 +23,8 @@
     "ergebnis/composer-normalize": "^2.8",
     "friendsofphp/php-cs-fixer": "^2.16.1",
     "phpstan/phpstan": "^1.8",
-    "symfony/phpunit-bridge": "^5.0"
+    "symfony/phpunit-bridge": "^5.0",
+    "phpunit/phpunit": "^8.5"
   },
   "autoload": {
     "psr-4": {
