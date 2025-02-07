@@ -77,8 +77,10 @@ class XliffFileDumper extends BaseXliffFileDumper
                     !empty($options['root_dir']) ? realpath($options['root_dir']) : false
                 );
 
-                $xliffBuilder->addFile('module_translations', $defaultLocale, $messages->getLocale());
-                $xliffBuilder->addTransUnit('module_translations', $source, $target, $this->getNote($metadata));
+                $fileName = $domain . '.' . $options['default_locale'];
+
+                $xliffBuilder->addFile($fileName, $defaultLocale, $messages->getLocale());
+                $xliffBuilder->addTransUnit($fileName, $source, $target, $this->getNote($metadata));
             }
         }
 
