@@ -26,6 +26,7 @@
 
 namespace AppBundle\Extract\Dumper;
 
+use PrestaShop\TranslationToolsBundle\Configuration;
 use PrestaShop\TranslationToolsBundle\Translation\Dumper\XliffFileDumper as BaseXliffFileDumper;
 use PrestaShop\TranslationToolsBundle\Translation\Builder\XliffBuilder;
 use Symfony\Component\Filesystem\Filesystem;
@@ -71,17 +72,20 @@ class XliffFileDumper extends BaseXliffFileDumper
             if (!empty($source)) {
                 $metadata = $messages->getMetadata($source, $domain);
 
-                $note = $this->getNoteWithFilePath($metadata);
+                $metadata['file'] = Configuration::getRelativePath(
+                    $metadata['file'],
+                    !empty($options['root_dir']) ? realpath($options['root_dir']) : false
+                );
 
                 $xliffBuilder->addFile('module_translations', $defaultLocale, $messages->getLocale());
-                $xliffBuilder->addTransUnit('module_translations', $source, $target, $note);
+                $xliffBuilder->addTransUnit('module_translations', $source, $target, $this->getNote($metadata));
             }
         }
 
         return html_entity_decode($xliffBuilder->build()->saveXML());
     }
 
-    private function getNoteWithFilePath($transMetadata): string
+    private function getNote($transMetadata): string
     {
         $notes = [];
 
