@@ -76,7 +76,7 @@ class XliffFileDumper extends BaseXliffFileDumper
 
                 $metadata['file'] = Configuration::getRelativePath(
                     $metadata['file'],
-                    !empty($options['root_dir']) ? realpath($options['root_dir'] . '/') : false
+                    !empty($options['root_dir']) ? realpath($options['root_dir']) : false
                 );
 
                 $xliffBuilder->addFile($fileName, $defaultLocale, $messages->getLocale());
@@ -93,9 +93,9 @@ class XliffFileDumper extends BaseXliffFileDumper
 
         if (!empty($transMetadata['file'])) {
             if (isset($transMetadata['line'])) {
-                $notes[] = '/' . str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']) . ':' . $transMetadata['line'];
+                $notes[] = str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']) . ':' . $transMetadata['line'];
             } else {
-                $notes[] = '/' . str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']);
+                $notes[] = str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']);
             }
         }
 
