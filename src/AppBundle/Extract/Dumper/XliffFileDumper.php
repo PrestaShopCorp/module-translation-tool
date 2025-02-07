@@ -64,7 +64,7 @@ class XliffFileDumper extends BaseXliffFileDumper
             $defaultLocale = \Locale::getDefault();
         }
 
-        $xliffBuilder = new XliffBuilder();
+        $xliffBuilder = new BaseXliffFileDumper();
         $xliffBuilder->setVersion('1.2');
 
         foreach ($messages->all($domain) as $source => $target) {
