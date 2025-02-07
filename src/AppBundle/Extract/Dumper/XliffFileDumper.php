@@ -27,7 +27,7 @@
 namespace AppBundle\Extract\Dumper;
 
 use PrestaShop\TranslationToolsBundle\Translation\Dumper\XliffFileDumper as BaseXliffFileDumper;
-use PrestaShop\TranslationToolsBundle\Translation\Helper\DomainHelper;
+use PrestaShop\TranslationToolsBundle\Translation\Builder\XliffBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageCatalogue;
 
@@ -64,7 +64,7 @@ class XliffFileDumper extends BaseXliffFileDumper
             $defaultLocale = \Locale::getDefault();
         }
 
-        $xliffBuilder = new BaseXliffFileDumper();
+        $xliffBuilder = new XliffBuilder();
         $xliffBuilder->setVersion('1.2');
 
         foreach ($messages->all($domain) as $source => $target) {
