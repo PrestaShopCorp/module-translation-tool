@@ -75,6 +75,7 @@ class PushCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $repositoryUrl = $input->getArgument('repository-url');
+        $ownerName = $this->extractOwnerName($repositoryUrl);
         $moduleName = $input->getArgument('module');
         $workDir = $input->getArgument('workdir');
         $sourceBranch = $input->getArgument('source-branch');
@@ -101,12 +102,29 @@ class PushCommand extends Command
         $remoteBranches = $repository->getRemoteBranches();
         if (in_array('origin/' . $branchName, $remoteBranches)) {
             $output->writeln(sprintf('Checking out to existing branch %s', $branchName));
+            $repository->execute('stash');
             $repository->checkout($branchName);
+            $repository->execute('pull');
+
+            try {
+                $repository->execute(['stash', 'apply', '-q']);
+            } catch(GitException $e) {}
+
+            $conflicts = $repository->execute(['diff', '--name-only', '--diff-filter=U']);
+            if (!empty($conflicts)) {
+                $output->writeln(sprintf('Conflicts detected. Resolving conflicts by keeping local changes.'));
+
+                foreach ($conflicts as $file) {
+                    $repository->execute(['checkout', '--theirs', $file]);
+                }
+                $repository->execute(['add', '.']);
+            }
+
+            $repository->execute(['stash', 'drop']);
+            $output->writeln('Stashed changes applied successfully.');
         } else {
             $output->writeln(sprintf('Creating new branch %s', $branchName));
-//            $repository->execute('stash');
             $repository->checkout($sourceBranch);
-//            @$repository->execute(['stash', 'pop']);
             $repository->createBranch($branchName, true);
         }
 
@@ -117,8 +135,8 @@ class PushCommand extends Command
             try {
                 // Commit changes
                 $repository->addAllChanges();
-                $repository->commit(sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime));
-                $repository->push(null, [$repositoryUrl, $branchName]);
+                $repository->commit(sprintf('Translation catalog update for version %s %s', $sourceBranch, $dateTime));
+                $repository->push(null, [$repositoryUrl, $branchName, (!empty($conflicts)) ? '--force' : null]);
                 $output->writeln('<info>Translations pushed</info>');
 
                 // Create the pull request
@@ -126,14 +144,24 @@ class PushCommand extends Command
                 $repositoryUsername = GitRepository::extractUsernameFromUrl($repositoryUrl);
 
                 if (!empty($repositoryUsername)) {
-                    $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
-                        'base'  => $sourceBranch,
-                        'head'  => $branchName,
-                        'title' => sprintf('Translation catalogue update for version %s %s', $sourceBranch, $dateTime),
-                        'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
+                    $existingPRs = $this->githubApi->getPullRequests($repositoryUsername, $repositoryName, [
+                        'base' => $sourceBranch,
+                        'head' => $ownerName . ':' . $branchName,
+                        'state' => 'open'
                     ]);
 
-                    $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
+                    if (empty($existingPRs)) {
+                        $pullRequest = $this->githubApi->createPullRequest($repositoryUsername, $repositoryName, [
+                            'base'  => $sourceBranch,
+                            'head'  => $branchName,
+                            'title' => 'Translation catalog update',
+                            'body'  => sprintf('This pull request contains the default catalogue updates introduced in the branch [%s]', $sourceBranch),
+                        ]);
+
+                        $output->writeln(sprintf('<info>Pull request created [#%d]</info>', (int) $pullRequest['number']));
+                    } else {
+                        $output->writeln('<info>Pull request already exists, skipping creation</info>');
+                    }
                 } else {
                     $output->writeln('<error>Error getting the repository username</error>');
                 }
@@ -151,5 +179,20 @@ class PushCommand extends Command
         }
 
         return 0;
+    }
+
+    /**
+     * @param $repositoryUrl
+     * @return string
+     */
+    public function extractOwnerName(string $repositoryUrl): string
+    {
+        $parsedUrl = parse_url($repositoryUrl);
+
+        if (preg_match('#/([^/]+)/([^/]+)\.git$#', $parsedUrl['path'], $matches)) {
+            return $matches[1];
+        }
+
+        throw new \InvalidArgumentException('Cannot extract owner name from repository URL.');
     }
 }
