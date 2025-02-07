@@ -87,10 +87,10 @@ class XliffFileDumper extends BaseXliffFileDumper
 
         if (!empty($transMetadata['file'])) {
             if (isset($transMetadata['line'])) {
-                $notes['line'] = 'Line: ' . $transMetadata['line'];
+                $notes[] = '/' . str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']) . ':' . $transMetadata['line'];
+            } else {
+                $notes[] = '/' . str_replace(DIRECTORY_SEPARATOR, '/', $transMetadata['file']);
             }
-
-            $notes['file'] = 'File: ' . $transMetadata['file'];
         }
 
         return implode(PHP_EOL, $notes);
