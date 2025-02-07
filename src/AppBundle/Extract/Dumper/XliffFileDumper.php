@@ -56,6 +56,43 @@ class XliffFileDumper extends BaseXliffFileDumper
         }
     }
 
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = []): string
+    {
+        if (array_key_exists('default_locale', $options)) {
+            $defaultLocale = $options['default_locale'];
+        } else {
+            $defaultLocale = \Locale::getDefault();
+        }
 
+        $xliffBuilder = new XliffBuilder();
+        $xliffBuilder->setVersion('1.2');
 
+        foreach ($messages->all($domain) as $source => $target) {
+            if (!empty($source)) {
+                $metadata = $messages->getMetadata($source, $domain);
+
+                $note = $this->getNoteWithFilePath($metadata);
+
+                $xliffBuilder->addFile('module_translations', $defaultLocale, $messages->getLocale());
+                $xliffBuilder->addTransUnit('module_translations', $source, $target, $note);
+            }
+        }
+
+        return html_entity_decode($xliffBuilder->build()->saveXML());
+    }
+
+    private function getNoteWithFilePath($transMetadata): string
+    {
+        $notes = [];
+
+        if (!empty($transMetadata['file'])) {
+            if (isset($transMetadata['line'])) {
+                $notes['line'] = 'Line: ' . $transMetadata['line'];
+            }
+
+            $notes['file'] = 'File: ' . $transMetadata['file'];
+        }
+
+        return implode(PHP_EOL, $notes);
+    }
 }
