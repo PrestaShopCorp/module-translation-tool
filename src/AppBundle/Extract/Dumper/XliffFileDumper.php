@@ -74,10 +74,13 @@ class XliffFileDumper extends BaseXliffFileDumper
             if (!empty($source)) {
                 $metadata = $messages->getMetadata($source, $domain);
 
-                $metadata['file'] = Configuration::getRelativePath(
-                    $metadata['file'],
-                    !empty($options['root_dir']) ? realpath($options['root_dir']) : false
-                );
+                if (!empty($metadata['file'])) {
+                    $metadata['file'] = Configuration::getRelativePath(
+                        $metadata['file'],
+                        !empty($options['root_dir']) ? realpath($options['root_dir']) : false
+                    );
+                }
+
 
                 $xliffBuilder->addFile($fileName, $defaultLocale, $messages->getLocale());
                 $xliffBuilder->addTransUnit($fileName, $source, $target, $this->getNote($metadata));
